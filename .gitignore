@@ -1,0 +1,51 @@
+# ===============================
+# Python
+# ===============================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+.venv/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# ===============================
+# Data Files (IMPORTANT)
+# ===============================
+data/
+*.csv
+*.xlsx
+*.zip
+__pycache__/
+.ipynb_checkpoints/
+
+# Large files
+*.zip
+*.tar
+*.gz
+
+# ===============================
+# OS Files
+# ===============================
+.DS_Store
+Thumbs.db
+
+# ===============================
+# VS Code
+# ===============================
+.vscode/
+
+# ===============================
+# Logs
+# ===============================
+*.log
+
+# ===============================
+# Environment Variables
+# ===============================
+.env
+
