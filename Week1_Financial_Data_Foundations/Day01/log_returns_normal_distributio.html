@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Returns & Normal Distribution</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f1117;
+            color: #e0e0e0;
+            padding: 24px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.6rem;
+            color: #00d4aa;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #1a1d27;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2a2d3a;
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .card p {
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+
+        canvas {
+            width: 100% !important;
+        }
+
+        .insight-box {
+            background: #12243a;
+            border-left: 3px solid #00d4aa;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-top: 14px;
+            font-size: 0.8rem;
+            color: #aad4ff;
+            line-height: 1.7;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .highlight {
+            color: #00d4aa;
+            font-weight: bold;
+        }
+
+        .red {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+
+        .green {
+            color: #51cf66;
+            font-weight: bold;
+        }
+
+        .orange {
+            color: #ff9f40;
+            font-weight: bold;
+        }
+
+        .example-box {
+            background: #1e1a2e;
+            border: 1px solid #5c4aaa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 14px;
+            font-size: 0.82rem;
+            line-height: 2;
+            font-family: monospace;
+            color: #c9b8ff;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .controls label {
+            font-size: 0.82rem;
+            color: #aaa;
+        }
+
+        .controls input[type=range] {
+            width: 130px;
+            accent-color: #00d4aa;
+        }
+
+        .controls span {
+            color: #00d4aa;
+            font-weight: bold;
+            font-size: 0.9rem;
+            min-width: 45px;
+        }
+
+        .symmetry-demo {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .sym-box {
+            background: #12243a;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 0.8rem;
+            line-height: 1.8;
+            text-align: center;
+        }
+
+        .sym-box h3 {
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .big-num {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: block;
+            margin: 8px 0;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .tag-bad {
+            background: #3a1a1a;
+            color: #ff6b6b;
+        }
+
+        .tag-good {
+            background: #0a2a1a;
+            color: #51cf66;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>📊 Why Log Returns are Normally Distributed</h1>
+    <p class="subtitle">And what "symmetric around zero" actually means in plain English</p>
+
+    <div class="grid">
+
+        <!-- Section 1: What symmetric around zero means -->
+        <div class="card full-width">
+            <h2>🎯 What Does "Symmetric Around Zero" Mean? — The Coin Flip Example</h2>
+            <p>Before touching finance, let's understand symmetry with something simple.</p>
+
+            <div class="symmetry-demo">
+                <div class="sym-box">
+                    <h3>🪙 Coin Flip (Perfectly Symmetric)</h3>
+                    <p style="color:#888; font-size:0.75rem;">Heads = +1, Tails = -1</p>
+                    <span class="big-num highlight">0</span>
+                    <p style="color:#aaa; font-size:0.75rem;">Average = 0<br>+1 and -1 are equally
+                        likely<br>Distribution is a mirror image around 0</p>
+                    <span class="tag tag-good">✅ Symmetric</span>
+                </div>
+                <div class="sym-box">
+                    <h3>💰 Simple Stock Return (Asymmetric)</h3>
+                    <p style="color:#888; font-size:0.75rem;">Max loss = -100%, Max gain = ∞</p>
+                    <span class="big-num red">Skewed</span>
+                    <p style="color:#aaa; font-size:0.75rem;">You CAN'T lose more than 100%<br>But you CAN gain 500%,
+                        1000%...<br>Right tail stretches to infinity</p>
+                    <span class="tag tag-bad">❌ Asymmetric</span>
+                </div>
+            </div>
+
+            <div class="example-box">
+                🏦 Concrete Example with ₹100 stock:<br><br>
+                Simple Return: +50% gain → ₹150 | -50% loss → ₹50 <span style="color:#ff6b6b">← NOT symmetric! +50 ≠ -50
+                    in price impact</span><br>
+                Simple Return: +100% gain → ₹200 | -100% loss → ₹0 <span style="color:#ff6b6b">← Hard floor at 0, no
+                    ceiling above</span><br><br>
+                Log Return: +0.5 gain → ₹165 | -0.5 loss → ₹61 <span style="color:#00d4aa">← Symmetric! Same magnitude,
+                    opposite direction</span><br>
+                Log Return: +1.0 gain → ₹272 | -1.0 loss → ₹37 <span style="color:#00d4aa">← Mirror image around zero
+                    ✅</span>
+            </div>
+
+            <div class="insight-box">
+                <strong>The Key Insight:</strong> In log return world, a gain of +X and a loss of -X are <span
+                    class="highlight">perfectly mirror images</span> of each other.
+                In simple return world they are NOT — because prices have a floor at zero but no ceiling.
+                This asymmetry breaks the math. Log returns fix it.
+            </div>
+        </div>
+
+        <!-- Section 2: Simple Returns Distribution -->
+        <div class="card">
+            <h2><span class="red">❌</span> Simple Returns — Skewed Distribution</h2>
+            <p>Notice the tail on the right is longer than the left. This is because gains are unbounded but losses stop
+                at -100%.</p>
+            <canvas id="simpleChart" height="220"></canvas>
+            <div class="insight-box">
+                <span class="red">Skewness > 0</span> — The distribution leans left with a long right tail.<br>
+                This breaks Black-Scholes which needs a <span class="highlight">symmetric bell curve</span> to work
+                mathematically.
+            </div>
+        </div>
+
+        <!-- Section 3: Log Returns Distribution -->
+        <div class="card">
+            <h2><span class="green">✅</span> Log Returns — Nearly Normal Distribution</h2>
+            <p>Notice how it looks like a bell curve centered near zero — almost perfectly symmetric on both sides.</p>
+            <canvas id="logChart" height="220"></canvas>
+            <div class="insight-box">
+                <span class="green">Skewness ≈ 0</span> — Nearly perfect bell curve centered at zero.<br>
+                Black-Scholes assumes this exact shape. This is why log returns are the <span class="highlight">standard
+                    in all of quant finance.</span>
+            </div>
+        </div>
+
+        <!-- Section 4: Side by side overlay -->
+        <div class="card full-width">
+            <h2>🔬 Side by Side — What Symmetry Around Zero Looks Like</h2>
+            <p>The green curve (log returns) is centered at zero and symmetric. The red curve (simple returns) is
+                shifted and skewed. Move the slider to change volatility.</p>
+            <div class="controls">
+                <label>Volatility: <span id="volDisplay">20</span>%</label>
+                <input type="range" min="5" max="60" value="20" id="volSlider">
+            </div>
+            <canvas id="overlayChart" height="180"></canvas>
+            <div class="insight-box">
+                <strong>What you're seeing:</strong><br>
+                🟢 <span class="green">Log Returns (green):</span> Perfectly centered at 0. Left side mirrors right side
+                exactly. This is what "symmetric around zero" means.<br>
+                🔴 <span class="red">Simple Returns (red):</span> Shifted right and skewed. The left tail is cut off at
+                -100% but the right tail goes forever.<br><br>
+                As you increase volatility, watch how simple returns get MORE skewed while log returns stay symmetric.
+            </div>
+        </div>
+
+        <!-- Section 5: The BS connection -->
+        <div class="card full-width">
+            <h2>🔗 Why Black-Scholes Needs This — The Direct Connection</h2>
+            <p>Black-Scholes assumes stock prices follow a Log-Normal distribution — which is exactly equivalent to
+                saying log returns are Normally distributed.</p>
+            <canvas id="bsChart" height="150"></canvas>
+            <div class="example-box">
+                Black-Scholes Core Assumption:<br><br>
+                ln(S_T / S_0) ~ Normal(μT, σ²T) <span style="color:#00d4aa">← Log return is normally
+                    distributed</span><br><br>
+                Which means:<br>
+                S_T = S_0 × e^(μT + σ√T × Z) <span style="color:#00d4aa">← Stock price follows Log-Normal</span><br>
+                where Z ~ Normal(0,1) <span style="color:#888">← Standard normal random variable</span><br><br>
+                <span style="color:#ff9f40">If you used simple returns instead of log returns,</span><br>
+                <span style="color:#ff9f40">this equation breaks down and Black-Scholes cannot be derived. Full
+                    stop.</span>
+            </div>
+            <div class="insight-box" style="margin-top:14px">
+                <strong>Plain English Version:</strong> Black-Scholes needs to calculate probabilities of where a stock
+                price will be in the future.
+                To calculate probabilities you need a known distribution. Log returns give you a <span
+                    class="highlight">Normal distribution</span> —
+                the most well understood distribution in all of statistics. Simple returns don't give you any clean
+                distribution.
+                That's why every options pricing model in the world uses log returns. Including the one you'll build in
+                Week 4. 🚀
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ── Helper: Generate normal distribution curve ──────────────────────
+        function normalPDF(x, mean, std) {
+            return (1 / (std * Math.sqrt(2 * Math.PI))) *
+                Math.exp(-0.5 * ((x - mean) / std) ** 2);
+        }
+
+        // ── Helper: Generate skewed distribution (simple returns approximation)
+        function skewedPDF(x, mean, std, skew) {
+            const base = normalPDF(x, mean + std * 0.3, std * 1.2);
+            const skewFactor = skew > 0 ? Math.exp(-Math.max(0, -(x - mean)) * 0.5) : 1;
+            return base * skewFactor;
+        }
+
+        // ── Chart 1: Simple Returns — skewed ───────────────────────────────
+        (function () {
+            const xs = [];
+            const simpleData = [];
+            const normalData = [];
+            for (let x = -0.15; x <= 0.25; x += 0.002) {
+                xs.push((x * 100).toFixed(1) + '%');
+                // Skewed distribution for simple returns
+                const skewed = x < -0.10 ? 0 :
+                    normalPDF(x, 0.001, 0.018) * (1 + Math.max(0, x) * 3);
+                simpleData.push(skewed);
+                normalData.push(normalPDF(x, 0.001, 0.018));
+            }
+
+            new Chart(document.getElementById('simpleChart'), {
+                type: 'line',
+                data: {
+                    labels: xs,
+                    datasets: [
+                        {
+                            label: 'Simple Returns (Actual)',
+                            data: simpleData,
+                            borderColor: '#ff6b6b',
+                            backgroundColor: 'rgba(255,107,107,0.15)',
+                            borderWidth: 2.5,
+                            pointRadius: 0,
+                            fill: true
+                        },
+                        {
+                            label: 'Perfect Normal (reference)',
+                            data: normalData,
+                            borderColor: '#ffffff33',
+                            borderWidth: 1.5,
+                            borderDash: [4, 4],
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    plugins: {
+                        legend: { labels: { color: '#ccc', font: { size: 10 } } },
+                        annotation: {}
+                    },
+                    scales: {
+                        x: { ticks: { color: '#555', maxTicksLimit: 8 }, grid: { color: '#1e2030' } },
+                        y: { ticks: { color: '#555' }, grid: { color: '#1e2030' }, title: { display: true, text: 'Frequency', color: '#666' } }
+                    }
+                }
+            });
+        })();
+
+        // ── Chart 2: Log Returns — normal ──────────────────────────────────
+        (function () {
+            const xs = [];
+            const logData = [];
+            for (let x = -0.06; x <= 0.06; x += 0.001) {
+                xs.push((x * 100).toFixed(1) + '%');
+                logData.push(normalPDF(x, 0, 0.012));
+            }
+
+            new Chart(document.getElementById('logChart'), {
+                type: 'line',
+                data: {
+                    labels: xs,
+                    datasets: [{
+                        label: 'Log Returns (Nearly Normal)',
+                        data: logData,
+                        borderColor: '#51cf66',
+                        backgroundColor: 'rgba(81,207,102,0.15)',
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        fill: true
+                    }]
+                },
+                options: {
+                    plugins: { legend: { labels: { color: '#ccc', font: { size: 10 } } } },
+                    scales: {
+                        x: { ticks: { color: '#555', maxTicksLimit: 8 }, grid: { color: '#1e2030' } },
+                        y: { ticks: { color: '#555' }, grid: { color: '#1e2030' }, title: { display: true, text: 'Frequency', color: '#666' } }
+                    }
+                }
+            });
+        })();
+
+        // ── Chart 3: Overlay — interactive ─────────────────────────────────
+        let overlayChart;
+
+        function buildOverlay(vol) {
+            const std = vol / 100;
+            const xs = [];
+            const logData = [];
+            const simpleData = [];
+
+            for (let x = -3 * std; x <= 3.5 * std; x += std * 0.05) {
+                xs.push((x * 100).toFixed(1) + '%');
+                logData.push(normalPDF(x, 0, std));
+                // Simple returns: shift mean right, longer right tail
+                const sv = std * 1.15;
+                const skewedVal = x < -(std * 0.9) ? 0 :
+                    normalPDF(x, std * 0.15, sv);
+                simpleData.push(skewedVal);
+            }
+
+            if (overlayChart) overlayChart.destroy();
+            overlayChart = new Chart(document.getElementById('overlayChart'), {
+                type: 'line',
+                data: {
+                    labels: xs,
+                    datasets: [
+                        {
+                            label: '✅ Log Returns (Symmetric around 0)',
+                            data: logData,
+                            borderColor: '#51cf66',
+                            backgroundColor: 'rgba(81,207,102,0.12)',
+                            borderWidth: 2.5,
+                            pointRadius: 0,
+                            fill: true
+                        },
+                        {
+                            label: '❌ Simple Returns (Skewed)',
+                            data: simpleData,
+                            borderColor: '#ff6b6b',
+                            backgroundColor: 'rgba(255,107,107,0.12)',
+                            borderWidth: 2.5,
+                            pointRadius: 0,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    animation: { duration: 300 },
+                    plugins: { legend: { labels: { color: '#ccc', font: { size: 11 } } } },
+                    scales: {
+                        x: {
+                            ticks: { color: '#555', maxTicksLimit: 10 },
+                            grid: { color: '#1e2030' },
+                            title: { display: true, text: 'Return', color: '#666' }
+                        },
+                        y: {
+                            ticks: { color: '#555' },
+                            grid: { color: '#1e2030' },
+                            title: { display: true, text: 'Frequency', color: '#666' }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.getElementById('volSlider').addEventListener('input', function () {
+            document.getElementById('volDisplay').textContent = this.value;
+            buildOverlay(parseInt(this.value));
+        });
+        buildOverlay(20);
+
+        // ── Chart 4: BS — Log-Normal stock price ───────────────────────────
+        (function () {
+            const xs = [];
+            const logNormal = [];
+            const normal = [];
+
+            for (let x = 0; x <= 300; x += 2) {
+                xs.push('₹' + x);
+                const mu = Math.log(100) + (0.08 - 0.5 * 0.04) * 1;
+                const sig = 0.2;
+                if (x > 0) {
+                    logNormal.push((1 / (x * sig * Math.sqrt(2 * Math.PI))) *
+                        Math.exp(-((Math.log(x) - mu) ** 2) / (2 * sig ** 2)));
+                } else {
+                    logNormal.push(0);
+                }
+                normal.push(normalPDF(x, 100, 20));
+            }
+
+            new Chart(document.getElementById('bsChart'), {
+                type: 'line',
+                data: {
+                    labels: xs,
+                    datasets: [
+                        {
+                            label: 'Log-Normal Stock Price (what BS assumes)',
+                            data: logNormal,
+                            borderColor: '#a78bfa',
+                            backgroundColor: 'rgba(167,139,250,0.15)',
+                            borderWidth: 2.5,
+                            pointRadius: 0,
+                            fill: true
+                        },
+                        {
+                            label: 'Normal Price (wrong — allows negative prices!)',
+                            data: normal,
+                            borderColor: '#ff6b6b55',
+                            borderWidth: 1.5,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    plugins: { legend: { labels: { color: '#ccc', font: { size: 11 } } } },
+                    scales: {
+                        x: {
+                            ticks: { color: '#555', maxTicksLimit: 10 },
+                            grid: { color: '#1e2030' },
+                            title: { display: true, text: 'Future Stock Price (₹)', color: '#666' }
+                        },
+                        y: {
+                            ticks: { color: '#555' },
+                            grid: { color: '#1e2030' },
+                            title: { display: true, text: 'Probability', color: '#666' }
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why sqrt(252)? — Visual Explainer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f1117;
+            color: #e0e0e0;
+            padding: 24px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.6rem;
+            color: #00d4aa;
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #1a1d27;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2a2d3a;
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .card p {
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 14px;
+            line-height: 1.5;
+        }
+
+        canvas {
+            width: 100% !important;
+        }
+
+        .insight-box {
+            background: #12243a;
+            border-left: 3px solid #00d4aa;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-top: 14px;
+            font-size: 0.8rem;
+            color: #aad4ff;
+            line-height: 1.6;
+        }
+
+        .formula-box {
+            background: #1e1a2e;
+            border: 1px solid #5c4aaa;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-top: 14px;
+            font-size: 0.85rem;
+            color: #c9b8ff;
+            line-height: 1.8;
+            font-family: monospace;
+        }
+
+        .highlight {
+            color: #00d4aa;
+            font-weight: bold;
+        }
+
+        .red {
+            color: #ff6b6b;
+        }
+
+        .green {
+            color: #51cf66;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .sim-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .sim-controls label {
+            font-size: 0.82rem;
+            color: #aaa;
+        }
+
+        .sim-controls input[type=range] {
+            width: 140px;
+            accent-color: #00d4aa;
+        }
+
+        .sim-controls span {
+            color: #00d4aa;
+            font-weight: bold;
+            font-size: 0.9rem;
+            min-width: 40px;
+        }
+
+        .btn {
+            background: #00d4aa;
+            color: #0f1117;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.82rem;
+        }
+
+        .btn:hover {
+            background: #00bfa0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        th {
+            background: #252838;
+            color: #00d4aa;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 7px 12px;
+            border-bottom: 1px solid #2a2d3a;
+        }
+
+        tr:hover td {
+            background: #1f2235;
+        }
+
+        .wrong {
+            color: #ff6b6b;
+            text-decoration: line-through;
+        }
+
+        .correct {
+            color: #51cf66;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>📊 Why Do We Multiply by √252?</h1>
+    <p class="subtitle">An interactive visual explainer for the Square Root of Time Rule in Finance</p>
+
+    <div class="grid">
+
+        <!-- Chart 1: Linear vs Sqrt scaling -->
+        <div class="card">
+            <h2>📈 Linear vs √Time Scaling</h2>
+            <p>If daily volatility = 1%, how does it grow over time? Linear scaling explodes — sqrt scaling stays
+                realistic.</p>
+            <canvas id="scalingChart" height="200"></canvas>
+            <div class="insight-box">
+                <span class="red">❌ Linear (×days):</span> After 252 days → <strong>252%</strong> volatility.
+                Absurd!<br>
+                <span class="green">✅ Sqrt (×√days):</span> After 252 days → <strong>15.87%</strong> volatility.
+                Realistic!
+            </div>
+        </div>
+
+        <!-- Chart 2: Coin flip random walk -->
+        <div class="card">
+            <h2>🪙 Random Walk Simulation</h2>
+            <p>Stock price as a coin flip — heads = +1%, tails = −1%. Watch how uncertainty spreads over time.</p>
+            <div class="sim-controls">
+                <label>Simulations: <span id="simCount">50</span></label>
+                <input type="range" min="10" max="200" value="50" id="simSlider">
+                <button class="btn" onclick="runSimulation()">▶ Run Again</button>
+            </div>
+            <canvas id="walkChart" height="200"></canvas>
+            <div class="insight-box">
+                The <span class="highlight">spread of paths</span> grows slowly — not linearly. That spread IS
+                volatility. It follows √time.
+            </div>
+        </div>
+
+        <!-- Chart 3: Variance vs Volatility over time -->
+        <div class="card">
+            <h2>⚗️ Variance vs Volatility Over Time</h2>
+            <p>Variance grows linearly with time. But Volatility = √Variance — so it grows with √time. This is the key!
+            </p>
+            <canvas id="varVolChart" height="200"></canvas>
+            <div class="insight-box">
+                <strong>The Math:</strong><br>
+                Variance after N days = N × daily_variance<br>
+                Volatility after N days = <span class="highlight">√N × daily_volatility</span><br>
+                So for 1 year: Vol = <span class="highlight">√252 × daily_vol</span>
+            </div>
+        </div>
+
+        <!-- Chart 4: Real annualization table -->
+        <div class="card">
+            <h2>🗓️ Annualization at Different Time Scales</h2>
+            <p>Given daily volatility = 1%, here's what it looks like across different periods.</p>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Days</th>
+                            <th class="wrong">❌ Linear</th>
+                            <th class="correct">✅ Sqrt</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+            <div class="formula-box">
+                Annual Vol = Daily Vol × <span class="highlight">√252</span><br>
+                Annual Vol = Daily Vol × <span class="highlight">15.87</span><br><br>
+                e.g. Daily Vol = 1.2%<br>
+                → Annual Vol = 1.2% × 15.87 = <span class="highlight">19.04%</span>
+            </div>
+        </div>
+
+        <!-- Full width: Black Scholes connection -->
+        <div class="card full-width">
+            <h2>🔗 Why This Matters for Black-Scholes (Week 4 Preview)</h2>
+            <p>The √time rule appears directly in the Black-Scholes formula. Understanding it now means you won't just
+                implement it blindly — you'll know WHY it's there.</p>
+            <canvas id="bsChart" height="120"></canvas>
+            <div class="insight-box" style="margin-top:14px">
+                In Black-Scholes: <strong>d1 = [ln(S/K) + (r + σ²/2)T] / (σ√T)</strong><br><br>
+                That <span class="highlight">σ√T</span> term is exactly the Square Root of Time Rule applied to
+                volatility σ over time horizon T.<br>
+                The longer the option has until expiry, the more uncertainty — and it grows as <span
+                    class="highlight">√T</span>, not T.
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ─── Chart 1: Linear vs Sqrt Scaling ───────────────────────────────
+        const days = Array.from({ length: 253 }, (_, i) => i);
+        const linearVol = days.map(d => d * 1);         // 1% daily vol, linear
+        const sqrtVol = days.map(d => Math.sqrt(d) * 1); // 1% daily vol, sqrt
+
+        new Chart(document.getElementById('scalingChart'), {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [
+                    {
+                        label: '❌ Linear Scaling (×days)',
+                        data: linearVol,
+                        borderColor: '#ff6b6b',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    },
+                    {
+                        label: '✅ Sqrt Scaling (×√days)',
+                        data: sqrtVol,
+                        borderColor: '#00d4aa',
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                plugins: { legend: { labels: { color: '#ccc', font: { size: 11 } } } },
+                scales: {
+                    x: { ticks: { color: '#666', maxTicksLimit: 8 }, grid: { color: '#222' }, title: { display: true, text: 'Trading Days', color: '#888' } },
+                    y: { ticks: { color: '#666' }, grid: { color: '#222' }, title: { display: true, text: 'Volatility (%)', color: '#888' } }
+                }
+            }
+        });
+
+        // ─── Chart 2: Random Walk Simulation ───────────────────────────────
+        const walkCtx = document.getElementById('walkChart').getContext('2d');
+        let walkChart;
+
+        document.getElementById('simSlider').addEventListener('input', function () {
+            document.getElementById('simCount').textContent = this.value;
+        });
+
+        function runSimulation() {
+            const n = parseInt(document.getElementById('simSlider').value);
+            const numDays = 60;
+            const datasets = [];
+
+            for (let s = 0; s < n; s++) {
+                let price = 100;
+                const path = [price];
+                for (let d = 0; d < numDays; d++) {
+                    price *= (Math.random() > 0.5 ? 1.01 : 0.99);
+                    path.push(price);
+                }
+                datasets.push({
+                    data: path,
+                    borderColor: `hsla(${160 + Math.random() * 60}, 70%, 55%, 0.25)`,
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: false
+                });
+            }
+
+            // Add mean line
+            datasets.push({
+                label: 'Mean Path',
+                data: Array(numDays + 1).fill(100),
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                fill: false
+            });
+
+            if (walkChart) walkChart.destroy();
+            walkChart = new Chart(walkCtx, {
+                type: 'line',
+                data: { labels: Array.from({ length: numDays + 1 }, (_, i) => i), datasets },
+                options: {
+                    animation: { duration: 400 },
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#666', maxTicksLimit: 8 }, grid: { color: '#222' }, title: { display: true, text: 'Days', color: '#888' } },
+                        y: { ticks: { color: '#666' }, grid: { color: '#222' }, title: { display: true, text: 'Price (₹)', color: '#888' } }
+                    }
+                }
+            });
+        }
+        runSimulation();
+
+        // ─── Chart 3: Variance vs Volatility ───────────────────────────────
+        const timePoints = Array.from({ length: 253 }, (_, i) => i);
+        const dailyVar = 0.0001; // (1%)^2
+        const variance = timePoints.map(t => t * dailyVar * 100);
+        const volatility = timePoints.map(t => Math.sqrt(t * dailyVar) * 100);
+
+        new Chart(document.getElementById('varVolChart'), {
+            type: 'line',
+            data: {
+                labels: timePoints,
+                datasets: [
+                    {
+                        label: 'Variance (grows linearly)',
+                        data: variance,
+                        borderColor: '#ff9f40',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false
+                    },
+                    {
+                        label: 'Volatility = √Variance (grows as √time)',
+                        data: volatility,
+                        borderColor: '#00d4aa',
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                plugins: { legend: { labels: { color: '#ccc', font: { size: 11 } } } },
+                scales: {
+                    x: { ticks: { color: '#666', maxTicksLimit: 8 }, grid: { color: '#222' }, title: { display: true, text: 'Days', color: '#888' } },
+                    y: { ticks: { color: '#666' }, grid: { color: '#222' }, title: { display: true, text: 'Value (%)', color: '#888' } }
+                }
+            }
+        });
+
+        // ─── Table ───────────────────────────────────────────────────────────
+        const periods = [
+            { label: '1 Day', days: 1 },
+            { label: '1 Week', days: 5 },
+            { label: '1 Month', days: 21 },
+            { label: '3 Months', days: 63 },
+            { label: '6 Months', days: 126 },
+            { label: '1 Year', days: 252 },
+        ];
+        const tbody = document.getElementById('tableBody');
+        periods.forEach(p => {
+            const linear = (p.days * 1).toFixed(2);
+            const sqrt = (Math.sqrt(p.days) * 1).toFixed(2);
+            tbody.innerHTML += `
+        <tr>
+            <td>${p.label}</td>
+            <td>${p.days}</td>
+            <td class="wrong">${linear}%</td>
+            <td class="correct">${sqrt}%</td>
+        </tr>`;
+        });
+
+        // ─── Chart 4: BS connection — option price vs time ──────────────────
+        const timeHorizon = Array.from({ length: 101 }, (_, i) => i / 100);
+        const sigma = 0.2;
+        const uncertainty = timeHorizon.map(t => sigma * Math.sqrt(t) * 100);
+
+        new Chart(document.getElementById('bsChart'), {
+            type: 'line',
+            data: {
+                labels: timeHorizon.map(t => `${(t * 12).toFixed(0)}m`),
+                datasets: [{
+                    label: 'σ√T — Uncertainty grows as √time (Black-Scholes)',
+                    data: uncertainty,
+                    borderColor: '#a78bfa',
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    fill: {
+                        target: 'origin',
+                        above: 'rgba(167,139,250,0.1)'
+                    }
+                }]
+            },
+            options: {
+                plugins: { legend: { labels: { color: '#ccc', font: { size: 11 } } } },
+                scales: {
+                    x: { ticks: { color: '#666', maxTicksLimit: 12 }, grid: { color: '#222' }, title: { display: true, text: 'Time to Expiry', color: '#888' } },
+                    y: { ticks: { color: '#666' }, grid: { color: '#222' }, title: { display: true, text: 'σ√T (%)', color: '#888' } }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
