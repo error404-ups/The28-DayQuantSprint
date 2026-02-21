@@ -6,7 +6,7 @@
 
 ## 🎯 Objective
 
-This repository documents my structured 28-day sprint to gain hands-on experience at the intersection of **Machine Learning and Quantitative Finance**. The goal is to go from foundational Python and finance concepts to building research-grade projects involving NLP-based stock prediction, portfolio optimization, and options pricing — directly inspired by published academic work.
+This repository documents my structured 28-day sprint to gain hands-on experience at the intersection of **Machine Learning and Quantitative Finance**. I am building this sprint as preparation for a research internship under Dr. Abhishek Jindal at DAIICT — the goal is to go from foundational Python and finance concepts to building research-grade projects involving NLP-based stock prediction, portfolio optimization, and options pricing, directly inspired by his published work.
 
 **Inspired by:**
 - *"Integrating Price and Textual Data for Next-Day Stock Movement Prediction"* — Jindal et al., CODS-COMAD 2024
@@ -160,13 +160,20 @@ A comparative study of classical and ML-based options pricing:
 | Week 3 — NLP Sentiment Analysis | ⬜ Not Started | Text + price predictor |
 | Week 4 — Portfolio & Options | ⬜ Not Started | BS vs NN options pricer |
 
+### Daily Log
+| Day | Topic | Status |
+| Day 1 | OHLCV Data & Log Returns | ✅ Complete |
+| Day 2 | Volatility & Risk Metrics | ✅ Complete |
+| Day 3 | Sharpe Ratio & Ulcer Index | 🔄  In Progress |
+| Day 4–28 | See weekly folders above | ⬜ Upcoming |
+
 ---
 
 ## 👤 About
 
-This sprint is part of my preparation for ML research in Quantitative Finance. I am documenting every step of the learning process — including mistakes, dead ends, and breakthroughs — to build both skills and accountability.
+This sprint is part of my preparation for ML research in Quantitative Finance. I am a student at Mahindra University, documenting every step of this learning journey — including mistakes, dead ends, and breakthroughs — to build both skills and accountability.
 
-**Connect:** [LinkedIn](http://www.linkedin.com/in/poojan-patel-422837373) | [GitHub]([https://github.com/error404-ups](https://github.com/error404-ups))
+**Connect:** [LinkedIn](http://www.linkedin.com/in/poojan-patel-422837373) | [GitHub](https://github.com/error404-ups)
 
 ---
 
